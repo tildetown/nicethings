@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+
+import os
+import sys
+import random
+
+#create list.txt
+def createlist():
+    thefile = open('/home/m455/code/projects/nicethings/list.txt', 'w+')
+    thefile.close()
+    print("list.txt created, try your command again and it should work :)")
+
+#display random nice message if no arguments are given
+def showrandomline():
+    thefile = open('/home/m455/code/projects/nicethings/list.txt', 'r')
+    filecontents = thefile.read(1)
+    if not filecontents:
+        print("sorry, there's nothing in list.txt.\nTry adding something to the list by typing:\nnicethings \"your message here\"")
+    else:
+        print("\n" + random.choice(list(open('/home/m455/code/projects/nicethings/list.txt', 'r'))))
+
+#too many arguments error
+def toomanyargs():
+    print("Sorry, I only accept one argument.\nTry using:\nnicethings \"your message here\"")
+
+#no input error
+def noinputerror():
+    print("Sorry, I couldn't find any input.\n\nTry using:\nnicethings \"your message here\"")
+
+#add user input to file and display to user what was added
+def addtofile():
+    thefile = open('/home/m455/code/projects/nicethings/list.txt', 'a')
+    thefile.write(sys.argv[1] + "\n")
+    thefile.close()
+    print("-----------------------------------------\nYou have added the following to the list:\n\n{}\n-----------------------------------------".format(sys.argv[1]))
+
+#how to handle different user inputs
+def handleargs():
+    if len(sys.argv) <= 1:
+        showrandomline()
+    elif len(sys.argv) > 2:
+        toomanyargs()
+    elif sys.argv[1].isspace() == True or sys.argv[1] == "":
+        noinputerror()
+    else:
+        addtofile()
+
+def handlechoice():
+    userchoice = input()
+    if userchoice == "y":
+        createlist()
+    elif userchoice == "n":
+        print("bye bye")
+    else:
+        print("sorry, I didn't get that, type either y or n:")
+        handlechoice()
+
+if os.path.exists('/home/m455/code/projects/nicethings/list.txt') == True:
+    handleargs()
+else:
+    print("list.txt doesn't exist\ndo you want me to make a list.txt file right now? (y/n)")
+    handlechoice()

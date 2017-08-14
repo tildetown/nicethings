@@ -55,8 +55,12 @@ def handlechoice():
         print("sorry, I didn't get that, type either y or n:")
         handlechoice()
 
-if os.path.exists('/home/m455/code/projects/nicethings/list.txt') == True:
-    handleargs()
-else:
-    print("list.txt doesn't exist\ndo you want me to make a list.txt file right now? (y/n)")
-    handlechoice()
+def main():
+    if os.path.exists('/home/m455/code/projects/nicethings/list.txt') == True:
+        handleargs()
+    else:
+        print("list.txt doesn't exist\ndo you want me to make a list.txt file right now? (y/n)")
+        handlechoice()
+
+if __name__ == '__main__':
+    main()

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import re
 import os
 import sys
 import random
@@ -17,7 +18,7 @@ def showrandomline():
     if not filecontents:
         print("sorry, there's nothing in list.txt.\nTry adding something to the list by typing:\nnicethings \"your message here\"")
     else:
-        print("\n" + random.choice(list(open('/home/m455/code/projects/nicethings/list.txt', 'r'))))
+        print(random.choice(list(open('/home/m455/code/projects/nicethings/list.txt', 'r'))).rstrip('\n'))
 
 #too many arguments error
 def toomanyargs():

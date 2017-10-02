@@ -9,6 +9,6 @@ It stores user{'s/s'} input into a text file if an argument is given. If no argu
 
 ### Usage
 ##### Adding a message to the file:
-`nicethings "insert your message here"`
+`$ nicethings "insert your message here"`
 ##### Randomly generate a message:
-`nicethings`
+`$ nicethings`

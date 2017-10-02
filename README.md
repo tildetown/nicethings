@@ -1,5 +1,5 @@
 # nicethings
-A poorly written python script that is to be used in shared unix servers to cheer people up
+A poorly written python script that is to be used on shared unix servers to cheer people up
 
 ### Note: 
 I've modified the file paths in this script so it will work on [tilde.town](https://tilde.town). You can adjust it accordingly

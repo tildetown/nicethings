@@ -1,7 +1,5 @@
 # nicethings
-A Python program to be used on shared unix servers to cheer people up
-
-*An old project for [tilde.town](https://tilde.town)*
+A Python program to be used on shared unix servers to cheer people up (An old project for [tilde.town](https://tilde.town))
 
 ## Note: 
 This has been modified to work on [tilde.town](https://tilde.town), but you may adjust it accordingly

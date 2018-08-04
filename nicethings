@@ -5,63 +5,67 @@ import os
 import sys
 import random
 
-#create list.txt
-def createlist():
-    thefile = open('/home/m455/code/projects/nicethings/list.txt', 'w+')
-    thefile.close()
-    print("list.txt created, try your command again and it should work :)")
+the_list = "list.txt"
+program_name = "nicethings"
+top_line = "-----------------------------------------\n"
+bottom_line = "\n-----------------------------------------"
 
-#display random nice message if no arguments are given
-def showrandomline():
-    thefile = open('/home/m455/code/projects/nicethings/list.txt', 'r')
-    filecontents = thefile.read(1)
-    if not filecontents:
-        print("sorry, there's nothing in list.txt.\nTry adding something to the list by typing:\nnicethings \"your message here\"")
+messages = {'list_created': "{} created, try your command again and it should work :)".format(the_list),
+            'list_empty': "sorry, there's nothing in {}\nTry adding something to the list by typing:\n{} \"your message here\"".format(the_list, program_name),
+            'args_too_many': "Sorry, I only accept one argument.\nTry using:\n{} \"your message here\"".format(program_name),
+            'input_null': "Sorry, I couldn't find any input.\n\nTry using:\n{} \"your message here\"".format(program_name),
+            'item_added': "You have added the following to the list:\n",
+            'try_again': "sorry, I didn't get that, try typing y or n:",
+            'file_not_found': "{} doesn't exist\ndo you want me to make a {} file right now? (y/n)".format(the_list, the_list)}
+            
+def write_to_file(list_file, content):
+    temp = open(list_file, 'a')
+    temp.write(content)
+    temp.close()
+
+def create_file(list_file):
+    open(list_file, 'a').close()
+    print(messages['list_created'])
+
+def show_random_line(list_file):
+    thefile = open(list_file, 'r').read(1)
+    temp = open(list_file, 'r')
+    contents = temp.read(1)
+    if not contents:
+        print(messages['list_empty'])
     else:
-        print(random.choice(list(open('/home/m455/code/projects/nicethings/list.txt', 'r'))).rstrip('\n'))
+        print(random.choice(list(open(the_list, 'r'))).rstrip('\n'))
 
-#too many arguments error
-def toomanyargs():
-    print("Sorry, I only accept one argument.\nTry using:\nnicethings \"your message here\"")
+def add_to_list():
+    write_to_file(the_list, sys.argv[1] + "\n")
+    print(top_line + messages['item_added'] + sys.argv[1] + bottom_line)
 
-#no input error
-def noinputerror():
-    print("Sorry, I couldn't find any input.\n\nTry using:\nnicethings \"your message here\"")
-
-#add user input to file and display to user what was added
-def addtofile():
-    thefile = open('/home/m455/code/projects/nicethings/list.txt', 'a')
-    thefile.write(sys.argv[1] + "\n")
-    thefile.close()
-    print("-----------------------------------------\nYou have added the following to the list:\n\n{}\n-----------------------------------------".format(sys.argv[1]))
-
-#how to handle different user inputs
-def handleargs():
+def hangle_args():
     if len(sys.argv) <= 1:
-        showrandomline()
+        show_random_line(the_list)
     elif len(sys.argv) > 2:
-        toomanyargs()
+        too_many_args()
     elif sys.argv[1].isspace() == True or sys.argv[1] == "":
-        noinputerror()
+        print(messages['input_null'])
     else:
-        addtofile()
+        add_to_list()
 
-def handlechoice():
+def prompt_file_creation():
     userchoice = input()
     if userchoice == "y":
-        createlist()
+        create_file(the_list)
     elif userchoice == "n":
         print("bye bye")
     else:
-        print("sorry, I didn't get that, type either y or n:")
-        handlechoice()
+        print(messages['try_again'])
+        prompt_file_creation()
 
 def main():
-    if os.path.exists('/home/m455/code/projects/nicethings/list.txt') == True:
-        handleargs()
+    if os.path.exists(the_list) == True:
+        hangle_args()
     else:
-        print("list.txt doesn't exist\ndo you want me to make a list.txt file right now? (y/n)")
-        handlechoice()
+        print(messages['file_not_found'])
+        prompt_file_creation()
 
 if __name__ == '__main__':
     main()

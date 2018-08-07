@@ -1,8 +1,5 @@
 # nicethings
-A Python program to be used on shared unix servers to cheer people up (An old project for [tilde.town](https://tilde.town))
-
-## Note: 
-This has been modified to work on [tilde.town](https://tilde.town), but you may adjust it accordingly
+A Python program to be used on shared unix servers to cheer people up (A little program for [tilde.town](https://tilde.town))
 
 ## How it works
 Stores the user's input into a generated `list.txt` file if an argument is given in quotes. If no arguments are given, a random line from the `list.txt` file will be displayed.
@@ -10,5 +7,5 @@ Stores the user's input into a generated `list.txt` file if an argument is given
 ## Usage
 ### Adding a message to the file:
 `$ nicethings "insert your message here"`
-### Randomly generate a message:
+### Randomly generating a message:
 `$ nicethings`

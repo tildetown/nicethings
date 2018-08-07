@@ -7,5 +7,6 @@ Stores the user's input into a generated `list.txt` file if an argument is given
 ## Usage
 ### Adding a message to the file:
 `$ nicethings "insert your message here"`
-### Randomly generating a message:
+
+### Outputting a random line from list.txt:
 `$ nicethings`

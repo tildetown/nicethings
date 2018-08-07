@@ -5,6 +5,7 @@ import os
 import sys
 import random
 
+# edit the path below accordingly
 the_list = "/home/m455/code/projects/nicethings/list.txt"
 program_name = "nicethings"
 top_line = "-----------------------------------------\n"

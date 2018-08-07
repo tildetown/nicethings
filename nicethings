@@ -20,18 +20,19 @@ messages = {'list_created': "{} created, try your command again and it should wo
             'too_many_args': "sorry, i only accept one argument.\ntry using:\n{} \"your message here\"".format(program_name),
             'file_not_found': "{} doesn't exist\ndo you want me to make a {} file right now? (y/n)".format(the_list, the_list)}
             
-def write_to_file(list_file, content):
-    temp = open(list_file, 'a')
+def write_to_file(a_file, content):
+    temp = open(a_file, 'a')
     temp.write(content)
     temp.close()
 
-def create_file(list_file):
-    open(list_file, 'a').close()
+def create_file(a_file):
+    open(a_file, 'a').close()
+    os.chmod(the_list, 0o666)
     print(messages['list_created'])
 
-def show_random_line(list_file):
-    thefile = open(list_file, 'r').read(1)
-    temp = open(list_file, 'r')
+def show_random_line(a_file):
+    thefile = open(a_file, 'r').read(1)
+    temp = open(a_file, 'r')
     contents = temp.read(1)
     if not contents:
         print(messages['list_empty'])

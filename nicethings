@@ -5,7 +5,7 @@ import os
 import sys
 import random
 
-the_list = "list.txt"
+the_list = "/home/m455/code/projects/nicethings/list.txt"
 program_name = "nicethings"
 top_line = "-----------------------------------------\n"
 bottom_line = "\n-----------------------------------------"

@@ -10,9 +10,9 @@ program_name = "nicethings"
 top_line = "-----------------------------------------\n"
 bottom_line = "\n-----------------------------------------"
 
-messages = {'list_created': "{} created, try your command again and it should work :)".format(the_list),
+messages = {'list_created': "{} created\n{} now readable and writeable by other users".format(the_list, the_list),
             'list_empty': "sorry, there's nothing in {}\nTry adding something to the list by typing:\n{} \"your message here\"".format(the_list, program_name),
-            'args_too_many': "Sorry, i only accept one argument.\ntry using:\n{} \"your message here\"".format(program_name),
+            'args_too_many': "sorry, i only accept one argument.\ntry using:\n{} \"your message here\"".format(program_name),
             'input_null': "sorry, i couldn't find any input.\n\niry using:\n{} \"your message here\"".format(program_name),
             'item_added': "you have added the following to the list:\n",
             'try_again': "sorry, i didn't get that, try typing y or n:",

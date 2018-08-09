@@ -42,7 +42,7 @@ def show_random_line(a_file):
 
 def add_to_list(args):
     write_to_file(the_list, args + "\n")
-    print(top_line + messages['item_added'], args, bottom_line)
+    print(top_line + messages['item_added'] + args + bottom_line)
 
 def hangle_args(args):
     if len(args) <= 1:

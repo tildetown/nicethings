@@ -12,6 +12,6 @@ Stores the user's input into a generated `list.txt` file if an argument is given
 `$ nicethings`
 
 # To-dos
-[ ] Only allow quoted messages to be added 
-[ ] Decentralize by allowing users to store their own
+- [ ] Only allow quoted messages to be added 
+- [ ] Decentralize by allowing users to store their own
 repository in their home folder

@@ -5,7 +5,6 @@ import os
 import sys
 import random
 
-# edit the path below accordingly
 the_list = "/home/m455/code/nicethings/list.txt"
 program_name = "nicethings"
 top_line = "-----------------------------------------\n"
@@ -32,7 +31,6 @@ def create_file(a_file):
     print(messages['list_created'])
 
 def show_random_line(a_file):
-    #thefile = open(a_file, 'r').read(1)
     temp = open(a_file, 'r')
     contents = temp.read(1)
     if not contents:

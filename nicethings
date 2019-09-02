@@ -32,7 +32,7 @@ def create_file(a_file):
     print(messages['list_created'])
 
 def show_random_line(a_file):
-    thefile = open(a_file, 'r').read(1)
+    #thefile = open(a_file, 'r').read(1)
     temp = open(a_file, 'r')
     contents = temp.read(1)
     if not contents:

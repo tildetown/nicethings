@@ -78,8 +78,7 @@
 
 (define (repair/fix-permissions)
   (file-or-directory-permissions nicethings-path 420)
-  (displayln-format (messages-ref 'permissions-fixed) nicethings-path)
-  ) ;; TEST
+  (displayln-format (messages-ref 'permissions-fixed) nicethings-path))
 
 (define (repair/wrong-permissions)
   (display (messages-ref 'wrong-permissions-prompt))
@@ -92,8 +91,7 @@
 (define (repair/create-file)
   (close-output-port (open-output-file nicethings-path))
   (file-or-directory-permissions nicethings-path 420)
-  (displayln-format (messages-ref 'file-created) nicethings-path)
-  ) ;; TEST
+  (displayln-format (messages-ref 'file-created) nicethings-path))
 
 (define (repair/not-found)
   (display (messages-ref 'not-found-prompt))

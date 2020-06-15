@@ -174,6 +174,7 @@
 ;; are multiple newline characters. This ensures
 ;; there is only one newline character.
 (define (add string)
+  (repair)
   (let* ([string-no-newline (string-replace string "\n" "")]
          [string-newline    (string-append string-no-newline "\n")])
     (display-to-file string-newline
@@ -188,7 +189,6 @@
   (build-path home-directory nicethings-string))
 
 (define (random-message)
-  (repair)
   (let* ([root                        (find-system-path 'sys-dir)]
          [root-home                   (build-path root "home")]
          [listof-homes                (directory-list root-home #:build? #t)]

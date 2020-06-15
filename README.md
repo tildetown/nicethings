@@ -1,35 +1,50 @@
 # nicethings
 
-A Python program to be used on shared unix servers to cheer people up (A little program for [tilde.town](https://tilde.town))
+A program for shared unix servers, specifically [tilde.town](https://tilde.town), to cheer people up .
 
-# To-dos
-
-- [ ] Decentralize by adding to and pulling from a text file in a user's home directory
-
+# Table of Contents**
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
-# Table of Contents
-
 - [How it works](#how-it-works)
+    - [How it works in detail](#how-it-works-in-detail)
+- [Installation](#installation)
 - [Usage](#usage)
-    - [Adding a message to the file:](#adding-a-message-to-the-file)
-    - [Outputting a random line from list.txt:](#outputting-a-random-line-from-listtxt)
-
 <!-- markdown-toc end -->
 
 # How it works
 
-nicethings stores the user's input into a `list.txt` file if an argument is
-given in quotes. If no arguments are given, then a random line from the
-`list.txt` file will be displayed.
+Users collaborate by adding or removing nice messages to their own
+list, where the messages are combined and then displayed at random by
+any user.
+
+## How it works in detail
+
+* Each user has a `~/.nicethings` directory.
+* Users can add messages to this file using the `nicethings add "your nice message here"` interface.
+* Each message is stored in the file as separate lines. No file format is used.
+* Users can display a numbered list of the messages they have stored using the `nicethings ls` interface.
+* Users can remove their own messages using the `nicethings rm 2` interface, where the number refers to an item in their list.
+* Users can view a random message from a random user using the `nicethings` interface (with no arguments).
+
+# Installation
+
+1. Run `git clone https://github.com/m455/nicethings`
+2. Run `cd nicethings`
+3. Run `make` for further instructions.
 
 # Usage
 
-Currently, a user can only add and output nice things to and from a list.txt located in m455's directory
+```
+town nicethings [<command>] [<args>]
 
-## Adding a message to the file:
+Commands:
+  No command - Print a random nice thing.
+  add        - Add a message to the list of nice things.
+  ls         - Print a numbered list of the nice things you have added.
+  rm         - Remove a message you have added from the list of nice things.
 
-`$ nicethings "insert your message here"`
-
-## Outputting a random line from list.txt:
-
-`$ nicethings`
+Examples:
+  town nicethings
+  town add \"You are beautiful\"
+  town ls
+  town rm 2
+```

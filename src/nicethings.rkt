@@ -197,9 +197,11 @@
          [directories-with-nicethings (filter file-exists? paths-to-nicethings)]
          [directories-with-420        (filter file-has-420-permissions? directories-with-nicethings)]
          [listof-nicethings           (apply append (map file->lines directories-with-420))]
-         [random-number               (random (length listof-nicethings))]
-         [random-nicething            (list-ref listof-nicethings random-number)])
-    (displayln random-nicething)))
+         [list-length                 (length listof-nicethings)])
+    (when (not (zero? list-length))
+      (let* ([random-number    (random list-length)]
+             [random-nicething (list-ref listof-nicethings random-number)])
+        (displayln random-nicething)))))
 
 ;; ------------------------------------------------
 ;; help

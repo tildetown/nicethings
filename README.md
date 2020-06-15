@@ -2,7 +2,7 @@
 
 A program for shared unix servers, specifically [tilde.town](https://tilde.town), to cheer people up .
 
-# Table of Contents**
+# Table of Contents
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
 - [How it works](#how-it-works)
     - [How it works in detail](#how-it-works-in-detail)

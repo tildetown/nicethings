@@ -13,34 +13,37 @@
 ;; ------------------------------------------------
 (define messages
   (hash
-  'not-found           "> '~a' wasn't found."
-  'repair-prompt       "> You will need it to use nicethings.\n> Do you want to create it? [y/n]\n> "
-  'fake-file-found     "> The directory '~a' was found.\n> Please move this file somewhere else before using nicethings."
-  'try                 (list "> For usage help, try running the following command:"
-                             "nicethings --help")
-  'cancel-creation     "> Cancelled nicethings file creation."
-  'file-created        "> '~a' was successfully created."
-  'not-an-option       "> Error: '~a' is not an option."
-  'add-expected-arg    (list "> Error: Found 'add', but no arguments were found."
-                             "> The 'add' command expects one quoted argument after it."
-                             "> Example:"
-                             "nicethings add \"You are beautiful\".")
-  'rm-expected-arg     (list "> Error: Found 'rm', but no arguments were found."
-                             "> The 'rm' command expects one number as an argument after it."
-                             "> Example:"
-                             "nicethings rm 2"
-                             "> Note: You may need to use the 'ls' command to see which number correlates to which message.")
-  'ls-expected-no-args (list "> Error: Found 'ls', but also found other arguments."
-                             "> The 'ls' command expects no arguments after it."
-                             "> Example:"
-                             "nicethings ls")
-  ;; I don't currently use this message yet:
-  'rm-expected-number  (list "> Error: Found '~a' after 'rm'."
-                             "> The 'rm' command expects one number as an argument after it."
-                             "> Example:"
-                             "nicethings rm 2"
-                             "> Note: You may need to use the 'ls' command to see which number correlates to which message.")
-  'added               "> Added '~a' to the list."))
+   'not-found                "> '~a' wasn't found."
+   'not-found-prompt         "> You will need it to use nicethings.\n> Do you want to create it? [y/n]\n> "
+   'wrong-permissions        "> '~a''s permissions are incorrect."
+   'wrong-permissions-prompt "> You will need the permissions to be fixed before using nicethings.\n> Do you want to fix them? [y/n]\n> "
+   'fake-file-found          "> The directory '~a' was found.\n> Please move this file somewhere else before using nicethings."
+   'try                      (list "> For usage help, try running the following command:"
+                                   "nicethings --help")
+   'cancel                   "> Cancelled."
+   'file-created             "> '~a' was successfully created."
+   'permissions-fixed        "> '~a''s permissions were successfully fixed."
+   'not-an-option            "> Error: '~a' is not an option."
+   'add-expected-arg         (list "> Error: Found 'add', but no arguments were found."
+                                   "> The 'add' command expects one quoted argument after it."
+                                   "> Example:"
+                                   "nicethings add \"You are beautiful\".")
+   'rm-expected-arg          (list "> Error: Found 'rm', but no arguments were found."
+                                   "> The 'rm' command expects one number as an argument after it."
+                                   "> Example:"
+                                   "nicethings rm 2"
+                                   "> Note: You may need to use the 'ls' command to see which number correlates to which message.")
+   'ls-expected-no-args      (list "> Error: Found 'ls', but also found other arguments."
+                                   "> The 'ls' command expects no arguments after it."
+                                   "> Example:"
+                                   "nicethings ls")
+   ;; I don't currently use this message yet:
+   'rm-expected-number       (list "> Error: Found '~a' after 'rm'."
+                                   "> The 'rm' command expects one number as an argument after it."
+                                   "> Example:"
+                                   "nicethings rm 2"
+                                   "> Note: You may need to use the 'ls' command to see which number correlates to which message.")
+   'added                    "> Added '~a' to the list."))
 
 ;; ------------------------------------------------
 ;; helpers
@@ -54,6 +57,12 @@
 
 (define (messages-ref key)
   (hash-ref messages key))
+
+(define (file-has-420-permissions? file)
+  (equal? 420 (file-or-directory-permissions file 'bits)))
+
+(define (append-nicethings-file home-directory)
+  (build-path home-directory nicethings-string))
 ;; ------------------------------------------------
 ;; repair
 ;; ------------------------------------------------
@@ -62,30 +71,50 @@
   (exit))
 
 (define (repair/cancel)
-  (displayln (messages-ref 'cancel-creation))
+  (displayln (messages-ref 'cancel))
   (exit))
 
-;; Check for a "fake" '.nicethings' file,
-;; which is a directory named '.nicethings'
-(define (repair/start)
-  (if (directory-exists? nicethings-path-local)
-      (begin (displayln-format (messages-ref 'fake-file-found) nicethings-path-local)
-             (exit))
-      (begin (close-output-port (open-output-file nicethings-path-local))
-             (displayln-format (messages-ref 'file-created) nicethings-path-local))))
+(define (repair/fix-permissions)
+  (file-or-directory-permissions nicethings-path-local 420)
+  (displayln-format (messages-ref 'permissions-fixed) nicethings-path-local)
+  (exit))
 
-(define (repair/prompt)
-  (display (messages-ref 'repair-prompt))
+(define (repair/wrong-permissions)
+  (display (messages-ref 'wrong-permissions-prompt))
   (let ([user-input (read-line)])
     (case (string->symbol user-input)
-      ['y   (repair/start)]
+      ['y   (repair/fix-permissions)]
+      ['n   (repair/cancel)]
+      [else (repair/not-an-option user-input)])))
+
+(define (repair/create-file)
+  (close-output-port (open-output-file nicethings-path-local))
+  (displayln-format (messages-ref 'file-created) nicethings-path-local)
+  (exit))
+
+(define (repair/not-found)
+  (display (messages-ref 'not-found-prompt))
+  (let ([user-input (read-line)])
+    (case (string->symbol user-input)
+      ['y   (repair/create-file)]
       ['n   (repair/cancel)]
       [else (repair/not-an-option user-input)])))
 
 (define (repair)
-  (when (not (file-exists? nicethings-path-local))
-    (displayln-format (messages-ref 'not-found) nicethings-path-local)
-    (repair/prompt)))
+  (cond
+    ;; Check for a "fake" '.nicethings' file, which is a directory named '.nicethings'
+    [(directory-exists? nicethings-path-local)
+     (begin (displayln-format (messages-ref 'fake-file-found) nicethings-path-local)
+            (exit))]
+    ;; Check for a missing '.nicethings' file
+    [(not (file-exists? nicethings-path-local))
+     (begin (displayln-format (messages-ref 'not-found) nicethings-path-local)
+            (repair/not-found))]
+    ;; Check for incorrect permissions on '.nicethings' file
+    [(not (file-has-420-permissions? nicethings-path-local))
+     (begin (displayln-format (messages-ref 'wrong-permissions) nicethings-path-local)
+            (repair/wrong-permissions))]
+    [else 'do-nothing]))
 
 ;; ------------------------------------------------
 ;; add message
@@ -106,29 +135,17 @@
 ;; ------------------------------------------------
 ;; random message
 ;; ------------------------------------------------
-;; The +1 includes the last element in the list
 (define (random-message)
   (repair)
-  ;; TODO: Don't use local path here. turn into global
-  ;; Algo:
-  ;; gather all directories in /home/                -> list
-  ;; filter file-exists? /home/directory/.nicethings -> list
-  ;; NOTES:
-  ;; /home
-  ;;(define root-home (build-path (find-system-path 'sys-dir) "home"))
-  ;; '(/home/username _ ...)
-  ;;(map path->complete-path (directory-list root-home))
-  ;;;;;;;;;;;;;;
-  ;; NOTES2:
-  ;;(define root-home (build-path (find-system-path 'sys-dir) "home"))
-  ;;(map (lambda (x) (build-path root-home x)) (directory-list root-home))
-  ;;;;;;;;;;;;
-
-  (let* ([root-home               (build-path (find-system-path 'sys-dir) "home")]
-         [paths-to-nicethings     (map (lambda (home-directory) (build-path root-home home-directory nicethings-string))
-                                       (directory-list root-home))])
-         (filter (lambda (x) (file-exists? x)) paths-to-nicethings)))
-         ;; [listof-paths    (map (lambda (path) (filter file-exists? path)) paths-to-nicethings)])
+  (let* ([root                        (find-system-path 'sys-dir)]               ;; /
+         [root-home                   (build-path root "home")]                  ;; /home
+         [listof-homes                (directory-list root-home #:build? #t)]    ;; #:build #t builds the full path
+         [paths-to-nicethings         (map append-nicethings-file listof-homes)] ;; '("/home/username/.nicethings")
+         [directories-with-nicethings (filter file-exists? paths-to-nicethings)]
+         [directories-with-420        (filter file-has-420-permissions? directories-with-nicethings)])
+    (for ([i directories-with-420])
+      (displayln i))
+    ))
 
     ;; (when (not (zero? list-length))
     ;;   (let* ([random-number     (random list-length)]

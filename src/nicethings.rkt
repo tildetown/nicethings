@@ -222,7 +222,7 @@
 (define (help)
   (displayln-for
    "Usage:"
-   "  town nicethings [<command>] [<args>]"
+   "  nicethings [<command>] [<args>]"
    ""
    "Commands:"
    "  No command - Print a random nice thing."
@@ -231,10 +231,10 @@
    "  rm         - Remove a message you have added from the list of nice things."
    ""
    "Examples:"
-   "  town nicethings"
-   "  town add \"You are beautiful\""
-   "  town ls"
-   "  town rm 2"))
+   "  nicethings"
+   "  add \"You are beautiful\""
+   "  ls"
+   "  rm 2"))
 
 (define (process-args vectorof-args)
   (define (args-ref number)

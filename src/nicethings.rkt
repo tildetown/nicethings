@@ -22,7 +22,7 @@
    'item-not-found           (list "> Error: Item not found."
                                    "> Try using the 'ls' command to see which number correlates to which message in your list.")
    'empty-list               "> Your list of nice things is empty."
-   'not-found-prompt         "> You will need it to use nicethings.\n> Do you want to create it? [y/n]\n> "
+   'not-found-prompt         "> You will need it to add new messages to nicethings.\n> Do you want to create it? [y/n]\n> "
    'wrong-permissions        "> '~a''s permissions are incorrect."
    'wrong-permissions-prompt "> You will need the permissions to be fixed before using nicethings.\n> Do you want to fix them? [y/n]\n> "
    'fake-file-found          "> The directory '~a' was found.\n> Please move this file somewhere else before using nicethings."
@@ -79,7 +79,7 @@
 (define (repair/fix-permissions)
   (file-or-directory-permissions nicethings-path 420)
   (displayln-format (messages-ref 'permissions-fixed) nicethings-path)
-  (exit))
+  ) ;; TEST
 
 (define (repair/wrong-permissions)
   (display (messages-ref 'wrong-permissions-prompt))
@@ -91,8 +91,9 @@
 
 (define (repair/create-file)
   (close-output-port (open-output-file nicethings-path))
+  (file-or-directory-permissions nicethings-path 420)
   (displayln-format (messages-ref 'file-created) nicethings-path)
-  (exit))
+  ) ;; TEST
 
 (define (repair/not-found)
   (display (messages-ref 'not-found-prompt))

@@ -160,14 +160,23 @@
          [list-length       (length listof-nicethings)])
     (if (and (not (null? listof-nicethings))
              (number? item-number)
-             ;; zero is okay in an index, but the user is never
-             ;; presented with a 0 option, so, if the user types
-             ;; `nicethings rm 1` add back the 1 that was
-             ;; subtracted above
              (positive? item-number)
              ;; 1 less than length, because we want to
              ;; remove the index number, which is one less
              ;; than the item the user chose
+             ;; Example:
+             ;; We have a list length of 3:
+             ;; '(1 2 3)
+             ;; `list-ref` in rm/remove-item above
+             ;; uses an index that starts at 0, so
+             ;; the index of the numbers above are:
+             ;; '(0 1 2)
+             ;; The 2 is the last index number in a
+             ;; list of length 3, which is what we
+             ;; want, because if you try to remove
+             ;; an index larger than 2, such as the
+             ;; list length 3, then that would be
+             ;; an error
              (< item-number-sub1 list-length))
         (rm/remove-item listof-nicethings item-number-sub1)
         (display-message-list 'item-not-found))))

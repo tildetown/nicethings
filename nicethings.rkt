@@ -1,4 +1,9 @@
-#lang racket
+#lang racket/base
+
+(require racket/file
+         racket/list
+         racket/match
+         racket/string)
 
 ;; ------------------------------------------------
 ;; values
@@ -6,7 +11,7 @@
 (define nicethings-string     ".nicethings")
 (define home-directory        (find-system-path 'home-dir))
 (define listof-home-contents  (directory-list home-directory))
-(define nicethings-path-local (build-path home-directory nicethings-string))
+(define nicethings-path       (build-path home-directory nicethings-string))
 
 ;; ------------------------------------------------
 ;; messages
@@ -14,6 +19,9 @@
 (define messages
   (hash
    'not-found                "> '~a' wasn't found."
+   'item-not-found           (list "> Error: Item not found."
+                                   "> Try using the 'ls' command to see which number correlates to which message in your list.")
+   'empty-list               "> Your list of nice things is empty."
    'not-found-prompt         "> You will need it to use nicethings.\n> Do you want to create it? [y/n]\n> "
    'wrong-permissions        "> '~a''s permissions are incorrect."
    'wrong-permissions-prompt "> You will need the permissions to be fixed before using nicethings.\n> Do you want to fix them? [y/n]\n> "
@@ -26,24 +34,17 @@
    'not-an-option            "> Error: '~a' is not an option."
    'add-expected-arg         (list "> Error: Found 'add', but no arguments were found."
                                    "> The 'add' command expects one quoted argument after it."
-                                   "> Example:"
-                                   "nicethings add \"You are beautiful\".")
+                                   "> Example: nicethings add \"You are beautiful\".")
    'rm-expected-arg          (list "> Error: Found 'rm', but no arguments were found."
                                    "> The 'rm' command expects one number as an argument after it."
-                                   "> Example:"
-                                   "nicethings rm 2"
-                                   "> Note: You may need to use the 'ls' command to see which number correlates to which message.")
+                                   "> Example: nicethings rm 2"
+                                   "> Note: You may need to use the 'ls' command to see which number correlates to which message in your list.")
    'ls-expected-no-args      (list "> Error: Found 'ls', but also found other arguments."
                                    "> The 'ls' command expects no arguments after it."
                                    "> Example:"
                                    "nicethings ls")
-   ;; I don't currently use this message yet:
-   'rm-expected-number       (list "> Error: Found '~a' after 'rm'."
-                                   "> The 'rm' command expects one number as an argument after it."
-                                   "> Example:"
-                                   "nicethings rm 2"
-                                   "> Note: You may need to use the 'ls' command to see which number correlates to which message.")
-   'added                    "> Added '~a' to the list."))
+   'added                    "> Added '~a' to your list of nice things."
+   'removed                  "> Removed '~a' from your list of nice things."))
 
 ;; ------------------------------------------------
 ;; helpers
@@ -51,6 +52,9 @@
 (define (displayln-for . strings)
   (for ([string strings])
     (displayln string)))
+
+(define (display-message-list key)
+  (apply displayln-for (messages-ref key)))
 
 (define-syntax-rule (displayln-format str ...)
   (displayln (format str ...)))
@@ -61,8 +65,6 @@
 (define (file-has-420-permissions? file)
   (equal? 420 (file-or-directory-permissions file 'bits)))
 
-(define (append-nicethings-file home-directory)
-  (build-path home-directory nicethings-string))
 ;; ------------------------------------------------
 ;; repair
 ;; ------------------------------------------------
@@ -75,8 +77,8 @@
   (exit))
 
 (define (repair/fix-permissions)
-  (file-or-directory-permissions nicethings-path-local 420)
-  (displayln-format (messages-ref 'permissions-fixed) nicethings-path-local)
+  (file-or-directory-permissions nicethings-path 420)
+  (displayln-format (messages-ref 'permissions-fixed) nicethings-path)
   (exit))
 
 (define (repair/wrong-permissions)
@@ -88,8 +90,8 @@
       [else (repair/not-an-option user-input)])))
 
 (define (repair/create-file)
-  (close-output-port (open-output-file nicethings-path-local))
-  (displayln-format (messages-ref 'file-created) nicethings-path-local)
+  (close-output-port (open-output-file nicethings-path))
+  (displayln-format (messages-ref 'file-created) nicethings-path)
   (exit))
 
 (define (repair/not-found)
@@ -103,21 +105,70 @@
 (define (repair)
   (cond
     ;; Check for a "fake" '.nicethings' file, which is a directory named '.nicethings'
-    [(directory-exists? nicethings-path-local)
-     (begin (displayln-format (messages-ref 'fake-file-found) nicethings-path-local)
+    [(directory-exists? nicethings-path)
+     (begin (displayln-format (messages-ref 'fake-file-found) nicethings-path)
             (exit))]
     ;; Check for a missing '.nicethings' file
-    [(not (file-exists? nicethings-path-local))
-     (begin (displayln-format (messages-ref 'not-found) nicethings-path-local)
+    [(not (file-exists? nicethings-path))
+     (begin (displayln-format (messages-ref 'not-found) nicethings-path)
             (repair/not-found))]
     ;; Check for incorrect permissions on '.nicethings' file
-    [(not (file-has-420-permissions? nicethings-path-local))
-     (begin (displayln-format (messages-ref 'wrong-permissions) nicethings-path-local)
+    [(not (file-has-420-permissions? nicethings-path))
+     (begin (displayln-format (messages-ref 'wrong-permissions) nicethings-path)
             (repair/wrong-permissions))]
     [else 'do-nothing]))
 
 ;; ------------------------------------------------
-;; add message
+;; ls
+;; ------------------------------------------------
+(define (ls/display-list listof-nicethings)
+  ;; add1 starts the listof-numbers at 1 instead of 0
+  (let* ([listof-numbers        (map add1 (range (length listof-nicethings)))]
+         [listof-number-strings (map number->string listof-numbers)]
+         [combine-lists         (lambda (a b) (string-append a ". " b))]
+         [listof-numbered-items (map combine-lists
+                                     listof-number-strings
+                                     listof-nicethings)])
+    (for ([item listof-numbered-items])
+      (displayln item))))
+
+(define (ls)
+  (repair)
+  (let ([listof-nicethings (file->lines nicethings-path)])
+    (if (null? listof-nicethings)
+        (displayln (messages-ref 'empty-list))
+        (ls/display-list listof-nicethings))))
+
+;; ------------------------------------------------
+;; rm
+;; ------------------------------------------------
+(define (rm/remove-item listof-nicethings item-number)
+  (let* ([item-to-remove    (list-ref listof-nicethings item-number)]
+         [list-without-item (remove item-to-remove listof-nicethings)])
+    (display-lines-to-file list-without-item
+                           nicethings-path
+                           #:exists 'truncate)
+    (displayln-format (messages-ref 'removed) item-to-remove)))
+
+(define (rm string)
+  (repair)
+  (let* ([listof-nicethings (file->lines nicethings-path)]
+         ;; subtract 1 because the index starts at
+         ;; 0 under the hood, but the numbers presented from 'ls'
+         ;; start at 1.
+         [item-number       (sub1 (string->number string))]
+         [list-length       (length listof-nicethings)])
+    (if (and (not (null? listof-nicethings))
+             (number? item-number)
+             (positive? item-number)
+             ;; less than length, because the index
+             ;; starts at 0 under the hood
+             (< item-number list-length))
+        (rm/remove-item listof-nicethings item-number)
+        (display-message-list 'item-not-found))))
+
+;; ------------------------------------------------
+;; add
 ;; ------------------------------------------------
 ;; The string-cleaned and -remade is incase there
 ;; are multiple newline characters. This ensures
@@ -125,32 +176,30 @@
 (define (add string)
   (repair)
   (let* ([string-no-newline (string-replace string "\n" "")]
-         [string-newline  (string-append string-no-newline "\n")])
-    ;; tell user item was added
+         [string-newline    (string-append string-no-newline "\n")])
     (display-to-file string-newline
-                     nicethings-path-local
+                     nicethings-path
                      #:exists 'append)
     (displayln-format (messages-ref 'added) string-no-newline)))
 
 ;; ------------------------------------------------
 ;; random message
 ;; ------------------------------------------------
+(define (random-message/append-nicethings-file home-directory)
+  (build-path home-directory nicethings-string))
+
 (define (random-message)
   (repair)
-  (let* ([root                        (find-system-path 'sys-dir)]               ;; /
-         [root-home                   (build-path root "home")]                  ;; /home
-         [listof-homes                (directory-list root-home #:build? #t)]    ;; #:build #t builds the full path
-         [paths-to-nicethings         (map append-nicethings-file listof-homes)] ;; '("/home/username/.nicethings")
+  (let* ([root                        (find-system-path 'sys-dir)]
+         [root-home                   (build-path root "home")]
+         [listof-homes                (directory-list root-home #:build? #t)]
+         [paths-to-nicethings         (map random-message/append-nicethings-file listof-homes)]
          [directories-with-nicethings (filter file-exists? paths-to-nicethings)]
-         [directories-with-420        (filter file-has-420-permissions? directories-with-nicethings)])
-    (for ([i directories-with-420])
-      (displayln i))
-    ))
-
-    ;; (when (not (zero? list-length))
-    ;;   (let* ([random-number     (random list-length)]
-    ;;          [random-nicething  (list-ref listof-nicethings random-number)])
-    ;;     (displayln random-nicething)))))
+         [directories-with-420        (filter file-has-420-permissions? directories-with-nicethings)]
+         [listof-nicethings           (apply append (map file->lines directories-with-420))]
+         [random-number               (random (length listof-nicethings))]
+         [random-nicething            (list-ref listof-nicethings random-number)])
+    (displayln random-nicething)))
 
 ;; ------------------------------------------------
 ;; help
@@ -175,22 +224,20 @@
 (define (process-args vectorof-args)
   (define (args-ref number)
     (vector-ref vectorof-args number))
-  (define (display-message key)
-    (apply displayln-for (messages-ref key)))
   (match vectorof-args
     ;; Proper usage
     [(or '#("-h")
          '#("--help")
          '#("help"))  (help)]
     [(vector "add" _) (add (args-ref 1))]
-    [(vector "rm" _)  (displayln "todo: make rm procedure")]
-    [(vector "ls")    (displayln "todo: make ls procedure")]
+    [(vector "rm" _)  (rm (args-ref 1))]
+    [(vector "ls")    (ls)]
     [(vector)         (random-message)]
     ;; Improper usage (Give the user hints if part of the usage is correct)
-    [(vector "ls" _)  (display-message 'ls-expected-no-args)]
-    [(vector "add")   (display-message 'add-expected-arg)]
-    [(vector "rm")    (display-message 'rm-expected-arg)]
-    [(vector _ ...)   (display-message 'try)]))
+    [(vector "ls" _)  (display-message-list 'ls-expected-no-args)]
+    [(vector "add")   (display-message-list 'add-expected-arg)]
+    [(vector "rm")    (display-message-list 'rm-expected-arg)]
+    [(vector _ ...)   (display-message-list 'try)]))
 
 (define (main vectorof-args)
   (process-args vectorof-args))

@@ -159,7 +159,11 @@
          [list-length       (length listof-nicethings)])
     (if (and (not (null? listof-nicethings))
              (number? item-number)
-             (positive? item-number)
+             ;; zero is okay in an index, but the user is never
+             ;; presented with a 0 option, so, if the user types
+             ;; `nicethings rm 1` add back the 1 that was
+             ;; subtracted above
+             (positive? (add1 item-number))
              ;; less than length, because the index
              ;; starts at 0 under the hood
              (< item-number list-length))

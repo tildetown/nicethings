@@ -155,7 +155,8 @@
          ;; subtract 1 because the index starts at
          ;; 0 under the hood, but the numbers presented from 'ls'
          ;; start at 1.
-         [item-number       (sub1 (string->number string))]
+         [item-number       (string->number string)]
+         [item-number-sub1  (sub1 item-number)]
          [list-length       (length listof-nicethings)])
     (if (and (not (null? listof-nicethings))
              (number? item-number)
@@ -163,11 +164,12 @@
              ;; presented with a 0 option, so, if the user types
              ;; `nicethings rm 1` add back the 1 that was
              ;; subtracted above
-             (positive? (add1 item-number))
-             ;; less than length, because the index
-             ;; starts at 0 under the hood
-             (< item-number list-length))
-        (rm/remove-item listof-nicethings item-number)
+             (positive? item-number)
+             ;; 1 less than length, because we want to
+             ;; remove the index number, which is one less
+             ;; than the item the user chose
+             (< item-number-sub1 list-length))
+        (rm/remove-item listof-nicethings item-number-sub1)
         (display-message-list 'item-not-found))))
 
 ;; ------------------------------------------------

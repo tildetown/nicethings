@@ -9,7 +9,7 @@
 ;; values
 ;; ------------------------------------------------
 (define nicethings-string     ".nicethings")
-(define nicethings-path       (build-path home-directory nicethings-string))
+(define nicethings-path       (build-path (find-system-path 'home-dir) nicethings-string))
 
 ;; ------------------------------------------------
 ;; messages

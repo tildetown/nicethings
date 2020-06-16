@@ -230,9 +230,9 @@
    ""
    "Examples:"
    "  nicethings"
-   "  add \"You are beautiful\""
-   "  ls"
-   "  rm 2"))
+   "  nicethings add \"You are beautiful\""
+   "  nicethings ls"
+   "  nicethings rm 2"))
 
 (define (process-args vectorof-args)
   (define (args-ref number)

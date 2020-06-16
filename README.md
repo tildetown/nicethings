@@ -34,7 +34,7 @@ any user.
 # Usage
 
 ```
-town nicethings [<command>] [<args>]
+nicethings [<command>] [<args>]
 
 Commands:
   No command - Print a random nice thing.
@@ -43,8 +43,8 @@ Commands:
   rm         - Remove a message you have added from the list of nice things.
 
 Examples:
-  town nicethings
-  town add \"You are beautiful\"
-  town ls
-  town rm 2
+  nicethings
+  nicethings add \"You are beautiful\"
+  nicethings ls
+  nicethings rm 2
 ```

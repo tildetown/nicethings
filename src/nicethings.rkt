@@ -9,8 +9,6 @@
 ;; values
 ;; ------------------------------------------------
 (define nicethings-string     ".nicethings")
-(define home-directory        (find-system-path 'home-dir))
-(define listof-home-contents  (directory-list home-directory))
 (define nicethings-path       (build-path home-directory nicethings-string))
 
 ;; ------------------------------------------------

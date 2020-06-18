@@ -2,8 +2,6 @@
 
 A program for shared Unix servers, specifically [tilde.town](https://tilde.town), to cheer people up .
 
-**Note: I haven't updated the Makefile, so I would avoid using it**
-
 # Table of Contents
 <!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
 - [How it works](#how-it-works)

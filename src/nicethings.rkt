@@ -6,12 +6,6 @@
          racket/string)
 
 ;; ------------------------------------------------
-;; OLD values
-;; ------------------------------------------------
-(define nicethings-string     ".nicethings")
-(define nicethings-path       (build-path (find-system-path 'home-dir) nicethings-string))
-
-;; ------------------------------------------------
 ;; values
 ;; ------------------------------------------------
 (define help-command        "help")
@@ -248,7 +242,7 @@
 ;; random message
 ;; ------------------------------------------------
 (define (random-message/append-nicethings-file home-directory)
-  (build-path home-directory nicethings-string))
+  (build-path home-directory program-name-dotted))
 
 (define (random-message)
   (let* ([root                        (find-system-path 'sys-dir)] ;; /

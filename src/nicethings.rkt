@@ -287,7 +287,7 @@
     [(vector add-command _) (add (args-ref 1))]
     [(vector rm-command _)  (rm  (args-ref 1))]
     [(vector ls-command)    (ls)]
-    [(vector)               (random)]
+    [(vector)               (random-message)]
     ;; Improper usage
     ;; This is checked so we can give the user hints on how to
     ;; use the software if they have part of the command

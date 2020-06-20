@@ -6,157 +6,207 @@
          racket/string)
 
 ;; ------------------------------------------------
-;; values
+;; OLD values
 ;; ------------------------------------------------
 (define nicethings-string     ".nicethings")
 (define nicethings-path       (build-path (find-system-path 'home-dir) nicethings-string))
+
+;; ------------------------------------------------
+;; values
+;; ------------------------------------------------
+(define help-command        "help")
+(define ls-command          "ls")
+(define rm-command          "rm")
+(define add-command         "add")
+(define program-name        "nicethings")
+(define program-name-dotted (string-append "." program-name))
+(define home-directory-path (find-system-path 'home-dir))
+(define program-path        (build-path home-directory-path program-name-dotted))
+(define correct-permissions 420) ;; -rw-r--r-- permissions
+(define message-prefix      "> ")
 
 ;; ------------------------------------------------
 ;; messages
 ;; ------------------------------------------------
 (define messages
   (hash
-   'not-found                "> '~a' wasn't found."
-   'item-not-found           (list "> Error: Item not found."
-                                   "> Try using the 'ls' command to see which number correlates to which message in your list.")
-   'empty-list               "> Your list of nice things is empty."
-   'not-found-prompt         "> You will need it to add new messages to nicethings.\n> Do you want to create it? [y/n]\n> "
-   'wrong-permissions        "> '~a''s permissions are incorrect."
-   'wrong-permissions-prompt "> You will need the permissions to be fixed before using nicethings.\n> Do you want to fix them? [y/n]\n> "
-   'fake-file-found          "> The directory '~a' was found.\n> Please move this file somewhere else before using nicethings."
-   'try                      (list "> For usage help, try running the following command:"
-                                   "nicethings --help")
-   'cancel                   "> Cancelled."
-   'file-created             "> '~a' was successfully created."
-   'permissions-fixed        "> '~a''s permissions were successfully fixed."
-   'not-an-option            "> Error: '~a' is not an option."
-   'add-expected-arg         (list "> Error: Found 'add', but no arguments were found."
-                                   "> The 'add' command expects one quoted argument after it."
-                                   "> Example: nicethings add \"You are beautiful\".")
-   'rm-expected-arg          (list "> Error: Found 'rm', but no arguments were found."
-                                   "> The 'rm' command expects one number as an argument after it."
-                                   "> Example: nicethings rm 2"
-                                   "> Note: You may need to use the 'ls' command to see which number correlates to which message in your list.")
-   'ls-expected-no-args      (list "> Error: Found 'ls', but also found other arguments."
-                                   "> The 'ls' command expects no arguments after it."
-                                   "> Example:"
-                                   "nicethings ls")
-   'added                    "> Added '~a' to your list of nice things."
-   'removed                  "> Removed '~a' from your list of nice things."))
+   'error-add                (list (format "Error: No arguments were found after the '~a' command." add-command)
+                                   (format "Suggestion: Try using a quoted argument after the '~a' command." ls-command)
+                                   (format "Example: ~a add \"Go for a walk\"" program-name))
+
+   'item-not-found           (list         "Error: Item not found."
+                                   (format "Suggestion: Try using the '~a' command to see which number " ls-command)
+                                           "            correlates to which message in your list."
+                                   (format "Example: ~a ~a" program-name ls-command))
+
+   'error-rm                 (list (format "Error: No arguments were found after the '~a' command." rm-command)
+                                   (format "Suggestion: Try using a number after the '~a' command." rm-command)
+                                   (format "Example: ~a ~a 2" program-name rm-command)
+                                   ""
+                                   (format "Note: You may need to run the '~a' command to see which " ls-command)
+                                           "      number correlates to which item in your list."
+                                   (format "Example: ~a ~a" program-name ls-command))
+
+   'error-usage              (list         "Error: Incorrect usage."
+                                   (format "Suggestions: Try running the '~a' command." help-command)
+                                   (format "Example: ~a ~a" program-name help-command))
+
+   'error-ls                 (list (format "Error: Found arguments after the '~a' command." ls-command)
+                                   (format "Suggestions: Try using '~a' without any arguments." ls-command)
+                                   (format "Example: ~a ~a" program-name ls-command))
+
+   'error-fake-file          (list (format "Error: A '~a' directory was found in your home directory." program-name-dotted)
+                                   (format "Suggestion 1: Move the '~a' directory out of your " program-name-dotted)
+                                   (format "              home directory before using ~a." program-name)
+                                   (format "Suggestion 2: Rename the '~a' directory before using ~a." program-name-dotted program-name))
+
+   'error-permissions-prompt (list (format "Error: '~a''s permissions are incorrect." program-path)
+                                           "Would you like to fix them? [y/n]")
+
+   'cancel-creation          (list (format "Cancelled the creation of ~a." program-path))
+
+   'permissions-fixed        (list (format "'~a''s permissions were successfully fixed." program-path))
+
+   'file-created             (list (format "'~a' was successfully created." program-path))
+
+   'not-found-prompt         (list (format "'~a' wasn't found." program-path)
+                                           "Would you like to create it? [y/n]")
+
+   'error-option             (list "Error: '~a' is not an option.")
+
+   'empty-list               (list "There is nothing in your list.")
+
+   'added                    (list "'~a' was added to your list.")
+
+   'removed                  (list "'~a' was removed from your list.")))
 
 ;; ------------------------------------------------
 ;; helpers
 ;; ------------------------------------------------
+(define (messages-ref key)
+  (map (lambda (element) (string-append message-prefix element))
+       (hash-ref messages key)))
+
+(define-syntax-rule (displayln-message-format key string ...)
+  (let ([string-to-format (string-join (messages-ref key) "\n")])
+    (displayln (format string-to-format string ...))))
+
+(define (displayln-message-list key)
+  (let ([listof-strings (messages-ref key)])
+    (for ([string listof-strings])
+      (displayln string))))
+
 (define (displayln-for . strings)
   (for ([string strings])
     (displayln string)))
 
-(define (display-message-list key)
-  (apply displayln-for (messages-ref key)))
-
-(define-syntax-rule (displayln-format str ...)
-  (displayln (format str ...)))
-
-(define (messages-ref key)
-  (hash-ref messages key))
-
-(define (file-has-420-permissions? file)
-  (equal? 420 (file-or-directory-permissions file 'bits)))
+(define (file-has-correct-permissions? file)
+  (equal? correct-permissions (file-or-directory-permissions file 'bits)))
 
 ;; ------------------------------------------------
 ;; repair
 ;; ------------------------------------------------
 (define (repair/not-an-option user-input)
-  (displayln-format (messages-ref 'not-an-option) user-input)
+  (displayln-message-format 'error-option user-input)
   (exit))
 
 (define (repair/cancel)
-  (displayln (messages-ref 'cancel))
+  (displayln-message-list 'cancel-creation)
   (exit))
 
-(define (repair/fix-permissions)
-  (file-or-directory-permissions nicethings-path 420)
-  (displayln-format (messages-ref 'permissions-fixed) nicethings-path))
+(define (repair/fake-file)
+  (displayln-message-list 'error-fake-file)
+  (exit))
 
-(define (repair/wrong-permissions)
-  (display (messages-ref 'wrong-permissions-prompt))
+(define (repair/create-exit-mode key)
+  (match key
+    [(or 'ls 'rm) (exit)]
+    ['add         'do-nothing]))
+
+(define (repair/fix-permissions key)
+  (file-or-directory-permissions program-path correct-permissions)
+  (displayln-message-list 'permissions-fixed)
+  (repair/create-exit-mode key))
+
+(define (repair/wrong-permissions key)
+  (displayln-message-list 'error-permissions-prompt)
+  (display message-prefix)
   (let ([user-input (read-line)])
     (case (string->symbol user-input)
-      ['y   (repair/fix-permissions)]
+      ['y   (repair/fix-permissions key)]
       ['n   (repair/cancel)]
       [else (repair/not-an-option user-input)])))
 
-(define (repair/create-file)
-  (close-output-port (open-output-file nicethings-path))
-  (file-or-directory-permissions nicethings-path 420)
-  (displayln-format (messages-ref 'file-created) nicethings-path))
+(define (repair/create-file key)
+  (close-output-port (open-output-file program-path))
+  (file-or-directory-permissions program-path correct-permissions)
+  (displayln-message-list 'file-created)
+  (repair/create-exit-mode key))
 
-(define (repair/not-found)
-  (display (messages-ref 'not-found-prompt))
+(define (repair/not-found key)
+  (displayln-message-list 'not-found-prompt)
+  (display message-prefix)
   (let ([user-input (read-line)])
     (case (string->symbol user-input)
-      ['y   (repair/create-file)]
+      ['y   (repair/create-file key)]
       ['n   (repair/cancel)]
       [else (repair/not-an-option user-input)])))
 
-(define (repair)
+(define (repair key)
   (cond
-    ;; Check for a "fake" '.nicethings' file, which is a directory named '.nicethings'
-    [(directory-exists? nicethings-path)
-     (begin (displayln-format (messages-ref 'fake-file-found) nicethings-path)
-            (exit))]
-    ;; Check for a missing '.nicethings' file
-    [(not (file-exists? nicethings-path))
-     (begin (displayln-format (messages-ref 'not-found) nicethings-path)
-            (repair/not-found))]
-    ;; Check for incorrect permissions on '.nicethings' file
-    [(not (file-has-420-permissions? nicethings-path))
-     (begin (displayln-format (messages-ref 'wrong-permissions) nicethings-path)
-            (repair/wrong-permissions))]
+    [(directory-exists? program-path)
+     (repair/fake-file)]
+
+    [(not (file-exists? program-path))
+     (repair/not-found key)]
+
+    [(not (file-has-correct-permissions? program-path))
+     (repair/wrong-permissions key)]
+
     [else 'do-nothing]))
 
 ;; ------------------------------------------------
 ;; ls
 ;; ------------------------------------------------
-(define (ls/display-list listof-nicethings)
+(define (ls/display-list listof-items)
   ;; add1 starts the listof-numbers at 1 instead of 0
-  (let* ([listof-numbers        (map add1 (range (length listof-nicethings)))]
+  (let* ([listof-numbers        (map add1 (range (length listof-items)))]
          [listof-number-strings (map number->string listof-numbers)]
          [combine-lists         (lambda (a b) (string-append a ". " b))]
          [listof-numbered-items (map combine-lists
                                      listof-number-strings
-                                     listof-nicethings)])
+                                     listof-items)])
     (for ([item listof-numbered-items])
       (displayln item))))
 
 (define (ls)
-  (repair)
-  (let ([listof-nicethings (file->lines nicethings-path)])
-    (if (null? listof-nicethings)
-        (displayln (messages-ref 'empty-list))
-        (ls/display-list listof-nicethings))))
+  (repair 'ls)
+  (let ([listof-items (file->lines program-path)])
+    (if (null? listof-items)
+        (displayln-message-list 'empty-list)
+        (ls/display-list listof-items))))
 
 ;; ------------------------------------------------
 ;; rm
 ;; ------------------------------------------------
-(define (rm/remove-item listof-nicethings item-number)
-  (let* ([item-to-remove    (list-ref listof-nicethings item-number)]
-         [list-without-item (remove item-to-remove listof-nicethings)])
+(define (rm/remove-item listof-items item-number)
+  (let* ([item-to-remove    (list-ref listof-items item-number)]
+         [list-without-item (remove item-to-remove listof-items)])
     (display-lines-to-file list-without-item
-                           nicethings-path
+                           program-path
                            #:exists 'truncate)
-    (displayln-format (messages-ref 'removed) item-to-remove)))
+    (displayln-message-format 'removed item-to-remove)))
 
 (define (rm string)
-  (repair)
-  (let* ([listof-nicethings (file->lines nicethings-path)]
+  (repair 'rm)
+  (let* ([listof-items (file->lines program-path)]
          ;; subtract 1 because the index starts at
          ;; 0 under the hood, but the numbers presented from 'ls'
          ;; start at 1.
          [item-number       (string->number string)]
          [item-number-sub1  (sub1 item-number)]
-         [list-length       (length listof-nicethings)])
-    (if (and (not (null? listof-nicethings))
+         [list-length       (length listof-items)])
+    (if (and (not (null? listof-items))
              (number? item-number)
              (positive? item-number)
              ;; 1 less than length, because we want to
@@ -176,8 +226,8 @@
              ;; list length 3, then that would be
              ;; an error
              (< item-number-sub1 list-length))
-        (rm/remove-item listof-nicethings item-number-sub1)
-        (display-message-list 'item-not-found))))
+        (rm/remove-item listof-items item-number-sub1)
+        (displayln-message-list 'item-not-found))))
 
 ;; ------------------------------------------------
 ;; add
@@ -186,13 +236,13 @@
 ;; are multiple newline characters. This ensures
 ;; there is only one newline character.
 (define (add string)
-  (repair)
+  (repair 'add)
   (let* ([string-no-newline (string-replace string "\n" "")]
          [string-newline    (string-append string-no-newline "\n")])
     (display-to-file string-newline
-                     nicethings-path
+                     program-path
                      #:exists 'append)
-    (displayln-format (messages-ref 'added) string-no-newline)))
+    (displayln-message-format 'added string-no-newline)))
 
 ;; ------------------------------------------------
 ;; random message
@@ -201,12 +251,12 @@
   (build-path home-directory nicethings-string))
 
 (define (random-message)
-  (let* ([root                        (find-system-path 'sys-dir)]
-         [root-home                   (build-path root "home")]
+  (let* ([root                        (find-system-path 'sys-dir)] ;; /
+         [root-home                   (build-path root "home")]    ;; /home
          [listof-homes                (directory-list root-home #:build? #t)]
          [paths-to-nicethings         (map random-message/append-nicethings-file listof-homes)]
          [directories-with-nicethings (filter file-exists? paths-to-nicethings)]
-         [directories-with-420        (filter file-has-420-permissions? directories-with-nicethings)]
+         [directories-with-420        (filter file-has-correct-permissions? directories-with-nicethings)]
          [listof-nicethings           (apply append (map file->lines directories-with-420))]
          [list-length                 (length listof-nicethings)])
     (when (not (zero? list-length))
@@ -216,23 +266,18 @@
 
 ;; ------------------------------------------------
 ;; help
-;; ------------------------------------------------
-(define (help)
-  (displayln-for
-   "Usage:"
-   "  nicethings [<command>] [<args>]"
+;; ------------------------------------------------ (define (help) (displayln-for "Usage:"
+   (format "  ~a [<command>] [<args>]" program-name)
    ""
    "Commands:"
-   "  No command - Print a random nice thing."
-   "  add        - Add a message to the list of nice things."
-   "  ls         - Print a numbered list of the nice things you have added."
-   "  rm         - Remove a message you have added from the list of nice things."
+   (format "  ~a - Adds an item to your list." add-command)
+   (format "  ~a - Prints a numbered list of your items." ls-command)
+   (format "  ~a - Removes an item from your list." rm-command)
    ""
    "Examples:"
-   "  nicethings"
-   "  nicethings add \"You are beautiful\""
-   "  nicethings ls"
-   "  nicethings rm 2"))
+   (format "  ~a ~a \"Go for a walk\"" program-name add-command)
+   (format "  ~a ~a" program-name ls-command)
+   (format "  ~a ~a 2" program-name rm-command)))
 
 (define (process-args vectorof-args)
   (define (args-ref number)
@@ -241,16 +286,19 @@
     ;; Proper usage
     [(or '#("-h")
          '#("--help")
-         '#("help"))  (help)]
-    [(vector "add" _) (add (args-ref 1))]
-    [(vector "rm" _)  (rm (args-ref 1))]
-    [(vector "ls")    (ls)]
-    [(vector)         (random-message)]
-    ;; Improper usage (Give the user hints if part of the usage is correct)
-    [(vector "ls" _)  (display-message-list 'ls-expected-no-args)]
-    [(vector "add")   (display-message-list 'add-expected-arg)]
-    [(vector "rm")    (display-message-list 'rm-expected-arg)]
-    [(vector _ ...)   (display-message-list 'try)]))
+         '#(help-command))  (help)]
+    [(vector add-command _) (add (args-ref 1))]
+    [(vector rm-command _)  (rm  (args-ref 1))]
+    [(vector ls-command)    (ls)]
+    [(vector)               (random)]
+    ;; Improper usage
+    ;; This is checked so we can give the user hints on how to
+    ;; use the software if they have part of the command
+    ;; correct
+    [(vector ls-command _) (displayln-message-list 'error-ls)]
+    [(vector add-command)  (displayln-message-list 'error-add)]
+    [(vector rm-command)   (displayln-message-list 'error-rm)]
+    [(vector _ ...))       (displayln-message-list 'error-usage)]))
 
 (define (main vectorof-args)
   (process-args vectorof-args))

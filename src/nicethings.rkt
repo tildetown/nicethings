@@ -301,7 +301,7 @@
     [(vector ls-command _) (displayln-message-list 'error-ls)]
     [(vector add-command)  (displayln-message-list 'error-add)]
     [(vector rm-command)   (displayln-message-list 'error-rm)]
-    [(vector _ ...))       (displayln-message-list 'error-usage)]))
+    [(vector _ ...)       (displayln-message-list 'error-usage)]))
 
 (define (main vectorof-args)
   (process-args vectorof-args))

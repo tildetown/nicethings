@@ -266,7 +266,10 @@
 
 ;; ------------------------------------------------
 ;; help
-;; ------------------------------------------------ (define (help) (displayln-for "Usage:"
+;; ------------------------------------------------
+(define (help)
+  (displayln-for
+   "Usage:"
    (format "  ~a [<command>] [<args>]" program-name)
    ""
    "Commands:"

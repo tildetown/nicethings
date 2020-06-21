@@ -272,7 +272,7 @@
    (format "  ~a - Removes an item from your list." rm-command)
    ""
    "Examples:"
-   (format "  ~a ~a \"Go for a walk\"" program-name add-command)
+   (format "  ~a ~a \"You are beautiful\"" program-name add-command)
    (format "  ~a ~a" program-name ls-command)
    (format "  ~a ~a 2" program-name rm-command)))
 

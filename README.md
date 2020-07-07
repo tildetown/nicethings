@@ -31,7 +31,7 @@ picked from from this list and is displayed to the user.
 
 1. Run `git clone https://github.com/m455/nicethings`
 2. Run `cd nicethings`
-3. Run `make` for further instructions.
+3. Run `make` for further installation instructions.
 
 # Usage
 

@@ -14,6 +14,7 @@
 (define add-command         "add")
 (define program-name        "nicethings")
 (define program-name-dotted (string-append "." program-name))
+;; /home/username/
 (define home-directory-path (find-system-path 'home-dir))
 (define program-path        (build-path home-directory-path program-name-dotted))
 (define correct-permissions 420) ;; -rw-r--r-- permissions

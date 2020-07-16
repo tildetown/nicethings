@@ -171,7 +171,7 @@ This section assumes you have [downloaded nicethings](#downloading-nicethings).
 1. Run `cd nicethings`
 2. Run `make install-custom location=~/path/to/custom/location`
 
-Example: In step 2., you could run `make install-custom location=~/bin/`
+**Example**: In step 2., you could run `make install-custom location=~/bin/`
 
 # Uninstalling nicethings
 

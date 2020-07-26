@@ -84,7 +84,7 @@ Below is a list of platforms that nicethings can run on:
 The following items must be downloaded and installed before you can use nicethings:
 
 * Racket: [https://racket-lang.org/](https://racket-lang.org/)
-* nicethings's source code: [https://github.com/m455/nicethings](https://github.com/m455/nicethings)
+* nicethings's source code: [https://notabug.org/m455/nicethings](https://notabug.org/m455/nicethings)
 
 # Quick start
 
@@ -92,7 +92,7 @@ This section is for users who are familiar with git, a Unix-like command line en
 scripting.
 
 1. Make sure [Racket](https://racket-lang.org/) is installed
-2. `git clone https://github.com/m455/nicethings`
+2. `git clone https://notabug.org/m455/nicethings`
 3. `cd nicethings`
 4. `sudo make install-global`
 5. `nicethings`
@@ -119,7 +119,7 @@ will need the source code to install nicethings.
 
 ### To download nicethings using git
 
-1. Run `git clone https://github.com/m455/nicethings`
+1. Run `git clone https://notabug.org/m455/nicethings`
 
 **Note**: This will create a `nicethings` directory in your current directory.
 

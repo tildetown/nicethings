@@ -92,7 +92,7 @@ This section is for users who are familiar with git, a Unix-like command line en
 scripting.
 
 1. Make sure [Racket](https://racket-lang.org/) is installed
-2. `git clone https://notabug.org/m455/nicethings`
+2. `git clone -b main https://notabug.org/m455/nicethings`
 3. `cd nicethings`
 4. `sudo make install-global`
 5. `nicethings`

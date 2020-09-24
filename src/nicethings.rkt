@@ -309,13 +309,8 @@
     [(vector (== init-command))        (init)]
     [(vector (== add-command) a)       (add a)]
     [(vector (== rm-command)  a)       (rm  a)]
-    [(vector _ _ _ ...)
-     (displayln-messages-ref 'error-too-many-arguments)]
-    [(vector _ _)
-     (displayln-messages-ref 'error-incorrect-usage)]
-    [(vector _)
-     (displayln-messages-ref 'error-incorrect-usage)]
-    [_ (random-message)]))
+    [(vector _ ...)                    (displayln-messages-ref 'error-incorrect-usage)]
+    [_                                 (random-message)]))
 
 (define (main vectorof-args)
   (process-args vectorof-args))

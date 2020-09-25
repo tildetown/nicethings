@@ -1,6 +1,6 @@
 # nicethings
 
-A program for shared Unix servers, specifically [tilde.town](https://tilde.town), to cheer people up .
+A program for shared Unix servers, specifically [tilde.town](https://tilde.town), to cheer people up.
 
 # Table of Contents
 

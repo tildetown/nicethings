@@ -39,11 +39,10 @@ A program for shared Unix servers, specifically [tilde.town](https://tilde.town)
 
 # How it works
 
-Each user on the shared Unix server may have a `.nicethings` file. The
-`.nicethings` file may be populated with a list of nice messages
-created by a user. All users' `.nicethings` files are converted to
-lists. All lists are combined into one list. A random nice message is
-picked from from this list and is displayed to the user.
+Each user on the shared Unix server may have a `.nicethings` file. The `.nicethings` file may be
+populated with a list of nice messages created by a user. All users' `.nicethings` files are
+converted to lists. All lists are combined into one list. A random nice message is picked from from
+this list and is displayed to the user.
 
 ## How it works in detail
 

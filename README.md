@@ -92,7 +92,7 @@ This section is for users who are familiar with git, a Unix-like command line en
 scripting.
 
 1. Make sure [Racket](https://racket-lang.org/) is installed
-2. `git clone https://git.m455.casa/m455/nicethings`
+2. `git clone git://git.m455.casa/nicethings.git`
 3. `cd nicethings`
 4. `sudo make install-global`
 5. `nicethings`
@@ -119,7 +119,7 @@ will need the source code to install nicethings.
 
 ### To download nicethings using git
 
-1. Run `git clone https://git.m455.casa/m455/nicethings`
+1. Run `git clone git://git.m455.casa/nicethings.git`
 
 **Note**: This will create a `nicethings` directory in your current directory.
 
